@@ -333,15 +333,16 @@
 
   // Like extend, but doesn't ever overwrite a key that already
   // exists in obj
+
   _.defaults = function(obj) {
 
-    let wrk = Array.from(arguments);
-    let additions = wrk.slice(1);
+    let additions = Array.from(arguments).slice(1);
+
 
     _.each( additions, function( addition ) {
       for ( let key in addition ) {
         if ( obj[ key ] === undefined ) {
-          obj[key] = addition[ key ];
+          obj[ key ] = addition[ key ];
         }
       }
     });
@@ -391,6 +392,30 @@
   // already computed the result for the given argument and return that value
   // instead if possible.
   _.memoize = function(func) {
+
+    // var args = Array.from(func.arguments);
+    // var cache = [];
+    // var firstRun = true;
+
+    // if (firstRun) {
+    //   cache.push(func(args));
+    //   return func(args);
+    //   firstRun = false;
+    // } else {
+    //   return cache;
+    // }
+
+    var object = {};
+    return function() {
+      var argumentKey = JSON.stringify(arguments);
+      if (object[argumentKey]) {
+        return object[argumentKey];
+      } else {
+        var value = func.apply(this, arguments);
+        object[argumentKey] = value;
+        return value;
+      }
+    };
   };
 
   // Delays a function for the given number of milliseconds, and then calls
@@ -400,6 +425,13 @@
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call someFunction('a', 'b') after 500ms
   _.delay = function(func, wait) {
+
+    let args = Array.from(arguments).slice(2);
+
+    setTimeout(function( ) {
+      func.apply(null, args);
+    }, wait);
+
   };
 
 
@@ -414,6 +446,22 @@
   // input array. For a tip on how to make a copy of an array, see:
   // http://mdn.io/Array.prototype.slice
   _.shuffle = function(array) {
+
+    let wrk = array.slice();
+    let shuffled = array.slice();
+
+
+    var random = function getRandomInt(max) {
+      return Math.floor(Math.random() * Math.floor(max));
+    };
+
+
+    for (var i = 0; i < array.length; i++) {
+      var randomIndex = random(array.length);
+      [shuffled[i], shuffled[randomIndex]] = [shuffled[randomIndex], shuffled[i]];
+    }
+    return shuffled;
+
   };
 
 
