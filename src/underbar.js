@@ -261,21 +261,42 @@
   };
 
 
-  // Determine whether all of the elements match a truth test.
-  _.every = function(collection, iterator) {
+  // Determine whether all of the elements match a truthy test.
+  _.every = function(collection, iterator = _.identity) {
     // TIP: Try re-using reduce() here.
 
     // we want to know if EVERY element will return true with iterator(element)
     // .reduce(collection, iterator, true)
-    return _.reduce(collection, iterator, true);
+    return _.reduce( collection, function(bool, ele) {
+
+      let obj = typeof iterator(ele) === 'object';
+      let array = Array.isArray(iterator(ele));
+      let positive = Number(iterator(ele)) > 0;
+      let truthy = iterator(ele);
+
+      if ( !bool || ele === false ) {
+        return false;
+      }
+
+      if ( truthy || obj || array || positive ) {
+        return true;
+      }
+
+      return false;
+    }, true );
 
 
   };
 
   // Determine whether any of the elements pass a truth test. If no iterator is
   // provided, provide a default one
-  _.some = function(collection, iterator) {
+  _.some = function(collection, iterator = _.identity) {
     // TIP: There's a very clever way to re-use every() here.
+
+    return !_.every( collection, function( obj ) {
+      return !iterator( obj );
+    });
+    return false;
   };
 
 
@@ -298,11 +319,35 @@
   //     bla: "even more stuff"
   //   }); // obj1 now contains key1, key2, key3 and bla
   _.extend = function(obj) {
+    // use the arguments.slice(1) to select all the other objects to select
+    let wrk = Array.from(arguments);
+    let additions = wrk.slice(1);
+
+    _.each( additions, function( addition ) {
+      for ( let key in addition ) {
+        obj[ key ] = addition[ key ];
+      }
+    });
+    return obj;
   };
 
   // Like extend, but doesn't ever overwrite a key that already
   // exists in obj
   _.defaults = function(obj) {
+
+    let wrk = Array.from(arguments);
+    let additions = wrk.slice(1);
+
+    _.each( additions, function( addition ) {
+      for ( let key in addition ) {
+        if ( obj[ key ] === undefined ) {
+          obj[key] = addition[ key ];
+        }
+      }
+    });
+
+    return obj;
+
   };
 
 
